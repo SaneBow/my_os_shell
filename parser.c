@@ -26,10 +26,14 @@ bool is_builtin(int tokn, char TOKENS_2D, const char* builtins[BUILTIN_NUM]) {
 }
 
 
-void expand_wildcard(int tokn, char TOKENS_2D) {
-    if (tokn < 2) return;
+char**  expand_wildcard(int tokn, char TOKENS_2D) {
     glob_t globbuf;
     globbuf.gl_offs = 1;
+    if (tokn < 2) {
+        globbuf.gl_pathv[0] = tokens[0];
+        globbuf.gl_pathv[1] = NULL;
+        return globbuf.gl_pathv;
+    }
     
     glob(tokens[1], GLOB_DOOFFS | GLOB_NOCHECK, NULL, &globbuf);
     int i;
@@ -37,7 +41,7 @@ void expand_wildcard(int tokn, char TOKENS_2D) {
         glob(tokens[1], GLOB_DOOFFS | GLOB_NOCHECK | GLOB_APPEND, NULL, &globbuf);
     }
     globbuf.gl_pathv[0] = tokens[0];
-    printf("cnt: %d\ncmd:%s\n", (int)globbuf.gl_pathc, globbuf.gl_pathv[0]);
+    return globbuf.gl_pathv;
 }
 
 void join_tokens(int tokn, char TOKENS_2D, char* command) {
