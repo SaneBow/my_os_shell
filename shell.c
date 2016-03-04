@@ -42,11 +42,11 @@ void get_input(char* buf_in) {
     buf_in[strlen(buf_in)-1] = '\0';
 }
 
-bool parse_input(char* input, char* command) {
+bool parse_input(char* input, char* command, glob_t* globbuf) {
     char TOKENS_2D;
     int tokn = to_tokens(input, tokens);
     bool is_bltin = is_builtin(tokn, tokens, BUILTIN_LIST);
-    char** pathv = expand_wildcard(tokn, tokens);
+    expand_wildcard(tokn, tokens, globbuf);
     join_tokens(tokn, tokens, command);
     return is_bltin;
 }
@@ -77,7 +77,7 @@ void builtin_exec(char* command) {
 }
 
 
-void os_exec(char* command) {
-    printf("os: %s\n", command);
+void os_exec(glob_t * globbuf) {
+    printf("os: %s\n", globbuf->gl_pathv[0]);
 }
 
