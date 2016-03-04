@@ -46,7 +46,9 @@ bool parse_input(char* input, char* command) {
     char TOKENS_2D;
     int tokn = to_tokens(input, tokens);
     bool is_bltin = is_builtin(tokn, tokens, BUILTIN_LIST);
-    expand_wildcard(tokn, tokens);
+    if (!is_bltin) {
+        expand_wildcard(tokn, tokens);
+    }
     join_tokens(tokn, tokens, command);
     return is_bltin;
 }
@@ -78,6 +80,7 @@ void builtin_exec(char* command) {
 
 
 void os_exec(char* command) {
-    printf("os: %s\n", command);
+    //printf("os: %s\n", command);
+    
 }
 
