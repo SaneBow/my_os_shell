@@ -34,7 +34,7 @@ void handle_signal(bool sig_ignored) {
 
 
 void shell_prompt(char* ps) {
-    printf("[%s:%s] ", ps, get_cwd());
+    printf("[%s:%s]$ ", ps, get_cwd());
     fflush(stdout);
 }
 
