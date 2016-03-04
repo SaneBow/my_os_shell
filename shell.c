@@ -45,37 +45,28 @@ void get_input(char* buf_in) {
     buf_in[strlen(buf_in)-1] = '\0';
 }
 
-bool parse_input(char* input, char* command, glob_t* globbuf) {
+cmd_t parse_input(char* input, glob_t* globbuf) {
     char TOKENS_2D;
     int tokn = to_tokens(input, tokens);
+    if (tokn == 0) {
+        return CMD_BLANK;
+    }
     bool is_bltin = is_builtin(tokn, tokens, BUILTIN_LIST);
     expand_wildcard(tokn, tokens, globbuf);
-    join_tokens(tokn, tokens, command);
-    return is_bltin;
+    if (is_bltin) {
+        return CMD_BUILTIN;
+    } else {
+        return CMD_OS;
+    }
 }
 
 
-void builtin_exec(char* command) {
-    // count # of args by counting spaces
-    int argn = 0;
-    char* pch = strchr(command, ' ');
-    while (pch!=NULL) {
-        argn++;
-        pch = strchr(pch+1,' ');
-    }
+void builtin_exec(glob_t* globbuf) {
+    int argn = globbuf->gl_pathc;
     // parse command into func and args
-    char args[argn][INPUT_BUF_SIZE];
-    char func[INPUT_BUF_SIZE];
-    char *token = strtok(command, " ");
-    int i = -1;
-    while(token != NULL) {
-        if (i == -1) 
-            strcpy(func, token);
-        else
-            strcpy(args[i],token);
-        token = strtok(NULL, " ");
-        i++;
-    }
+    char* func = globbuf->gl_pathv[0];
+    char** args = &(globbuf->gl_pathv[1]);
+    
     builtin(func, args, argn);
 }
 
@@ -84,6 +75,7 @@ void os_exec(glob_t * globbuf) {
     setenv("PATH","/bin:/usr/bin:.",1);
     pid_t child_pid;
     if (!(child_pid = fork())) {
+        handle_signal(false);
         char* fname = globbuf->gl_pathv[0];
         execvp(fname, globbuf->gl_pathv);
         if (errno == ENOENT) {

@@ -2,6 +2,7 @@
 #include "builtin.h"
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <glob.h>
 
 int to_tokens(char* input, char TOKENS_2D) {
@@ -26,12 +27,13 @@ bool is_builtin(int tokn, char TOKENS_2D, const char* builtins[BUILTIN_NUM]) {
 }
 
 
-void  expand_wildcard(int tokn, char TOKENS_2D, glob_t* globbuf) {
+void expand_wildcard(int tokn, char TOKENS_2D, glob_t* globbuf) {
     globbuf->gl_offs = 1;
 
     if (tokn < 2) {
         glob("", GLOB_DOOFFS | GLOB_NOCHECK, NULL, globbuf);
         globbuf->gl_pathv[1] = NULL;
+        globbuf->gl_pathc -= 1;
     } else {
         glob(tokens[1], GLOB_DOOFFS | GLOB_NOCHECK, NULL, globbuf);
         int i;
@@ -39,17 +41,9 @@ void  expand_wildcard(int tokn, char TOKENS_2D, glob_t* globbuf) {
             glob(tokens[i], GLOB_DOOFFS | GLOB_NOCHECK | GLOB_APPEND, NULL, globbuf);
         }
     }
-    globbuf->gl_pathv[0] = tokens[0];
-}
-
-void join_tokens(int tokn, char TOKENS_2D, char* command) {
-    int i;
-    // initiate with an empty string
-    command[0] = '\0';
-    for (i=0 ;i < tokn ;i++) {
-        strcat(command, strcat(tokens[i]," "));
-    }
-    // delete tailing space
-    command[strlen(command)-1] = '\0';
+    // make a copy of tokens[0] to prevent its change
+    char *fname = malloc( (strlen(tokens[0])+1) * sizeof(char) );
+    strcpy(fname,tokens[0]);
+    globbuf->gl_pathv[0] = fname;
 }
 
