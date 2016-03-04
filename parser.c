@@ -28,16 +28,16 @@ bool is_builtin(int tokn, char TOKENS_2D, const char* builtins[BUILTIN_NUM]) {
 
 void  expand_wildcard(int tokn, char TOKENS_2D, glob_t* globbuf) {
     globbuf->gl_offs = 1;
+
     if (tokn < 2) {
         glob("", GLOB_DOOFFS | GLOB_NOCHECK, NULL, globbuf);
         globbuf->gl_pathv[1] = NULL;
     } else {
         glob(tokens[1], GLOB_DOOFFS | GLOB_NOCHECK, NULL, globbuf);
-    }
-    
-    int i;
-    for (i=2; i < tokn; i++) {
-        glob(tokens[i], GLOB_DOOFFS | GLOB_NOCHECK | GLOB_APPEND, NULL, globbuf);
+        int i;
+        for (i=2; i < tokn; i++) {
+            glob(tokens[i], GLOB_DOOFFS | GLOB_NOCHECK | GLOB_APPEND, NULL, globbuf);
+        }
     }
     globbuf->gl_pathv[0] = tokens[0];
 }

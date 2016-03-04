@@ -6,6 +6,9 @@
 #include <signal.h>
 #include <string.h>
 #include <stdlib.h>
+#include <unistd.h>
+#include <sys/wait.h>
+#include <errno.h>
 
 
 void sig_handler(int signum) {
@@ -78,6 +81,19 @@ void builtin_exec(char* command) {
 
 
 void os_exec(glob_t * globbuf) {
-    printf("os: %s\n", globbuf->gl_pathv[0]);
+    setenv("PATH","/bin:/usr/bin:.",1);
+    pid_t child_pid;
+    if (!(child_pid = fork())) {
+        char* fname = globbuf->gl_pathv[0];
+        execvp(fname, globbuf->gl_pathv);
+        if (errno == ENOENT) {
+            printf("%s: command not found\n", fname);
+        } else {
+            printf("%s: unkown error\n", fname);
+        }
+        exit(-1);
+    } else {
+        wait(NULL);
+    }
 }
 
