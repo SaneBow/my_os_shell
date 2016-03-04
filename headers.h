@@ -7,5 +7,6 @@
 #define PS1 "3150 shell"
 typedef enum {false, true} bool;
 typedef enum {CMD_BLANK, CMD_BUILTIN, CMD_OS} cmd_t;
+bool HAS_PROMPT;
 
 #endif

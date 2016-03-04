@@ -14,6 +14,7 @@
 void sig_handler(int signum) {
     printf("\n");
     shell_prompt(PS1);
+    HAS_PROMPT = true;
 }
 
 
@@ -44,6 +45,7 @@ void get_input(char* buf_in) {
     }
     buf_in[strlen(buf_in)-1] = '\0';
 }
+
 
 cmd_t parse_input(char* input, glob_t* globbuf) {
     char TOKENS_2D;
