@@ -2,21 +2,30 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+
 int main() {
 
     char buf[INPUT_BUF_SIZE];
-    char command[INPUT_BUF_SIZE];
+    glob_t expanded_cmd;
 
     handle_signal(true);
     
+    HAS_PROMPT = false;
     while(1) {
-        shell_prompt(PS1);
+        if (!HAS_PROMPT) 
+            shell_prompt(PS1);
         get_input(buf);
-        bool is_bltin = parse_input(buf, command);
-        if (is_bltin) {
-            builtin_exec(command);
-        } else {
-            os_exec(command);
+        cmd_t cmd_type = parse_input(buf, &expanded_cmd);
+        HAS_PROMPT = false;
+        switch (cmd_type) {
+            case CMD_BLANK:
+                break;
+            case CMD_BUILTIN: 
+                builtin_exec(&expanded_cmd);
+                break;
+            case CMD_OS:
+                os_exec(&expanded_cmd);
+                break;
         }
     }
 

@@ -9,7 +9,7 @@ const char* BUILTIN_LIST[BUILTIN_NUM] = {
     "exit"
 };
 
-void builtin(char* func, char args[][INPUT_BUF_SIZE], int argn) {
+void builtin(char* func, char** args, int argn) {
     if (strcmp(func, "cd") == 0) {
         if (argn != 1) {
             printf("cd: wrong number of arguments\n");
