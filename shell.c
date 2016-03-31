@@ -83,7 +83,7 @@ void os_exec(glob_t * globbuf) {
         if (errno == ENOENT) {
             printf("%s: command not found\n", fname);
         } else {
-            printf("%s: unkown error\n", fname);
+            printf("%s: unknown error\n", fname);
         }
         exit(-1);
     } else {
